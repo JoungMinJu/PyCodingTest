@@ -2,7 +2,7 @@ import sys
 from heapq import heappop, heappush
 
 input = lambda: sys.stdin.readline().rstrip()
-INF = 10 ** 6
+INF = float("INF")
 
 
 def dijkstra(start):
@@ -13,10 +13,10 @@ def dijkstra(start):
 
     while heap:
         now_weight, now_node = heappop(heap)
+        if dist[now_node] < now_weight :
+            continue
         for next_node, next_weight in link[now_node]:
-            if dist[next_node] < next_weight:
-                continue
-            if dist[next_node] > now_weight + next_weight and heights[now_node] <= heights[next_node]:
+            if dist[next_node] > now_weight + next_weight and heights[now_node] < heights[next_node]:
                 dist[next_node] = now_weight + next_weight
                 heappush(heap, (dist[next_node], next_node))
     return dist
@@ -39,7 +39,7 @@ for _ in range(M):
 start_dist = dijkstra(1)
 end_dist = dijkstra(N)
 
-answer = -float(INF)
+answer = -INF
 for i in range(2, N):
     answer = max(answer, heights[i] * E - (start_dist[i] + end_dist[i]) * D)
 
