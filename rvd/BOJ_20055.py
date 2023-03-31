@@ -1,42 +1,29 @@
-# 1. 벨트가 각 칸 위의 로봇과 함께 한 칸 회전
-# 2. 가장 먼저! 벨트에 올라간 로봇부터 벨트가 회전하는 방향으로 한 칸 이동할 수 있다면 이동. (없으면 가만히)
-    # -> 이동하려면 그 칸에 로봇에 없음 and 내구도 >=1
-# 3. 올리는 위치에 있는 칸의 내구도가 0이 아니면 그 위치에 로봇 올림
-# 4. 내구도가 0인 칸의 개수가 K개 이상이면 과정 종료. 아니면 1번으로 다시
-
-## 보충 필요
 from collections import deque
 
-N, K = map(int, input().split())
-strong = list(map(int, input().split()))
-robots = deque([])
-belt = deque([i for i in range(2*N)])
+n, k = map(int, input().split())
+a = deque(map(int, input().split()))  # 내구도. A1, A2, ..., A2N
+robot = deque([0] * n)  # 벨트위에 있는 로봇
+result = 0
 
-stage = 0
-zero_count = 0
-while True :
-    stage += 1
-    # 1번
-    belt.appendleft(belt.pop())
-    outside_index = [i % (2*N) for i in range(belt[N], belt[N]+N)]
-    # 2번
-    size = len(robots)
-    for _ in range(size) :
-        robot = robots.popleft()
-        if robot in outside_index :
-            continue
-        next_idx = (robot + 1) % (2*N)
-        if strong[next_idx] >= 1 and next_idx != belt[N] and not next_idx in robots:
-            strong[next_idx] -= 1
-            if strong[next_idx] == 0 :
-                zero_count += 1
-            robots.append(next_idx)
-    # 3번
-    if strong[belt[0]] != 0 :
-        robots.append(belt[0])
-        strong[belt[0]] -= 1
-        if strong[belt[0]] == 0 :
-            zero_count += 1
-    if zero_count >= K :
+while True:
+    result += 1
+    # 1. 벨트 회전한다.
+    a.rotate(1)
+    robot[-1] = 0
+    robot.rotate(1)
+    robot[-1] = 0    # 내리는 위치에 도달한 경우, 즉시 내림
+    # 2. 로봇 이동하기. 이동하려는 칸에 로봇 x, 내구도 1이상 남아야함.
+    for i in range(n - 2, -1, -1):  # 먼저 올라간 로봇부터 진행
+        if a[i + 1] >= 1 and robot[i + 1] == 0 and robot[i] == 1:
+            robot[i + 1] = 1
+            robot[i] = 0
+            a[i + 1] -= 1
+    robot[-1] = 0  # 내리는 위치에 도달한 경우, 즉시 내림
+    # 3. 올리는 위치에 내구도 0 아니면 로봇 올리기 & 내구도 감소
+    if a[0] != 0 and robot[0] != 1:
+        robot[0] = 1
+        a[0] -= 1
+    # 4. 내구도 0인 칸 수가 k이상이면 종료
+    if a.count(0) >= k:
         break
-print(stage)
+print(result)
