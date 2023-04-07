@@ -75,4 +75,7 @@ for row in range(len_board):
             tmp_cnt = bfs(row, col)
             max_cnt = max(max_cnt, tmp_cnt)
 print(total)
-print(max_cnt)
+if max_cnt <= 1 :
+    print(0)
+else :
+    print(max_cnt)
